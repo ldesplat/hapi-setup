@@ -1,62 +1,87 @@
-import React, { PropTypes } from 'react';
+'use strict';
+
+import React, { PropTypes, Component } from 'react';
+import shouldPureComponentUpdate from 'react-pure-render/function';
+import { Flex, rgb } from 'jsxstyle';
 import Runtime from './runtime';
+import Tab from './components/tab';
 import Connection from './connection';
+import { primaryColor, secondaryColor, textColor, tabHeight } from './LayoutConstants';
 
 // runtime: versions, execPath, argv, execArgv, cwd, env
 // connections Array: uri, labels, routes, plugins
 
-export default class App {
+export default class App extends Component {
+
     static propTypes = {
-        data: PropTypes.object
+        data: PropTypes.shape({
+            runtime: PropTypes.object.isRequired,
+            connections: PropTypes.array.isRequired
+        }).isRequired,
+        location: PropTypes.object.isRequired,
+        onHistory: PropTypes.func.isRequired
+    };
+
+    shouldComponentUpdate = shouldPureComponentUpdate;
+
+    constructor(props) {
+
+        super(props);
     };
 
     render() {
 
         const connections = this.props.data.connections;
 
-        let connectionNames = [];
-        let connectionSections = [];
+        let tabs = [ <Tab key='tab-0' title='Process' link='process' onClick={this.props.onHistory}/> ];
+        //let connectionSections = [];
 
-        connections.forEach(function (connection, index) {
+        connections.forEach((connection, index) => {
 
             const name = 'Connection ' + (index + 1);
-            const selector = 'connection-' + index;
-            connectionNames.push(
-                <a key={'link-' + name} href={'#' + selector} className='mdl-layout__tab'>{name}</a>
-            );
-
-            connectionSections.push(
-                <section key={selector} className='mdl-layout__tab-panel' id={selector}>
-                    <div className='page-content'>
-                        <Connection data={connection} index={index} />
-                    </div>
-                </section>
-            );
+            const selector = 'connection-' + (index + 1);
+            tabs.push( <Tab key={'tab-' + (index + 1)} title={name} link={selector} onClick={this.props.onHistory}/>);
         });
 
+        let content;
+
+        const loc = this.props.location.pathname
+
+        if (loc.indexOf('process') !== -1) {
+            content = <Runtime data={this.props.data.runtime} />;
+        }
+        else if (loc.indexOf('connection') !== -1) {
+            let index = parseInt(loc.slice(loc.indexOf('connection') + 11));
+            content = <Connection data={this.props.data.connections[index - 1]} index={index} />
+        }
+
         return (
-            <div className='mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs'>
-                <header className='mdl-layout__header'>
-                    <div className='mdl-layout__header-row'>
-                        <span className='mdl-layout-title'>Hapi Setup</span>
-                    </div>
-                    <div className='mdl-layout__tab-bar mdl-js-ripple-effect'>
-                        <a href='#fixed-tab-1' className='mdl-layout__tab is-active'>Runtime Information</a>
-                        {connectionNames}
-                    </div>
-                </header>
-                <div className='mdl-layout__drawer'>
-                    <span className='mdl-layout-title'>Hapi Setup</span>
-                </div>
-                <main className='mdl-layout__content'>
-                    <section className='mdl-layout__tab-panel is-active' id='fixed-tab-1'>
-                        <div className='page-content'>
-                            <Runtime data={this.props.data.runtime} />
-                        </div>
-                    </section>
-                    {connectionSections}
-                </main>
-            </div>
+            <Flex flexDirection='column' color={textColor}>
+                <Flex
+                    justifyContent='center'
+                    alignItems='center'
+                    height={tabHeight}
+                    backgroundColor={primaryColor}>
+                    <span style={{
+                        color: 'white',
+                        fontWeight: 400,
+                        fontSize: '1.5em'
+                    }}>
+                        Hapi Setup
+                    </span>
+                </Flex>
+                <Flex
+                    flexDirection='row'
+                    alignItems='flex-start'
+                    flexWrap='wrap'
+                    backgroundColor={primaryColor}
+                    marginBottom='10'>
+                    {tabs}
+                </Flex>
+                <Flex>
+                    {content}
+                </Flex>
+            </Flex>
         );
     };
 };

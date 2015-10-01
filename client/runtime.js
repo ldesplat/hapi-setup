@@ -1,4 +1,9 @@
-import React, { PropTypes } from 'react';
+'use strict';
+
+import React, { PropTypes, Component } from 'react';
+import shouldPureComponentUpdate from 'react-pure-render/function';
+import { Flex, Table, TableCell, TableRow } from 'jsxstyle';
+import { tabHeight, primaryColor, secondaryColor } from './LayoutConstants';
 import Card from './components/card';
 
 // runtime: versions, execPath, argv, execArgv, cwd, env
@@ -17,25 +22,21 @@ export default class Runtime {
         Object.keys(versionData).forEach((version) => {
 
             versions.push(
-                <tr key={version}>
-                    <td className='mdl-data-table__cell--non-numeric'>{version}</td>
-                    <td className='mdl-data-table__cell--non-numeric'>{versionData[version]}</td>
-                </tr>
+                <TableRow key={version}>
+                    <TableCell>{version}</TableCell>
+                    <TableCell>{versionData[version]}</TableCell>
+                </TableRow>
             );
         });
 
         let versionTable = (
-            <table className='mdl-data-table mdl-js-data-table' style={{width: '100%'}}>
-                <thead>
-                    <tr>
-                        <th className='mdl-data-table__cell--non-numeric'>Module</th>
-                        <th className='mdl-data-table__cell--non-numeric'>Version</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {versions}
-                </tbody>
-            </table>
+            <Table>
+                <TableRow>
+                    <TableCell alignItems='center' justifyContent='center'>Module</TableCell>
+                    <TableCell>Version</TableCell>
+                </TableRow>
+                {versions}
+            </Table>
         );
 
         return versionTable;
@@ -48,13 +49,13 @@ export default class Runtime {
 
         let processContent = (
             <div>
-                <h5>Executed From</h5>
+                <div>Executed From</div>
                 {runtime.execPath}
                 <hr />
-                <h5>Using the following arguments</h5>
+                <div>Using the following arguments</div>
                 {args}
                 <hr />
-                <h5>Current Working Directory</h5>
+                <div>Current Working Directory</div>
                 {runtime.cwd}
             </div>
         );
@@ -70,25 +71,21 @@ export default class Runtime {
         Object.keys(environment).forEach((env) => {
 
             environments.push(
-                <tr key={env}>
-                    <td className='mdl-data-table__cell--non-numeric'>{env}</td>
-                    <td className='mdl-data-table__cell--non-numeric'>{environment[env]}</td>
-                </tr>
+                <TableRow key={env}>
+                    <TableCell>{env}</TableCell>
+                    <TableCell>{environment[env]}</TableCell>
+                </TableRow>
             );
         });
 
         let environmentTable = (
-            <table className='mdl-data-table mdl-js-data-table' style={{width: '100%'}}>
-                <thead>
-                    <tr>
-                        <th className='mdl-data-table__cell--non-numeric'>Key</th>
-                        <th className='mdl-data-table__cell--non-numeric'>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {environments}
-                </tbody>
-            </table>
+            <Table>
+                <TableRow>
+                    <TableCell>Key</TableCell>
+                    <TableCell>Value</TableCell>
+                </TableRow>
+                {environments}
+            </Table>
         );
 
         return environmentTable;
@@ -99,17 +96,12 @@ export default class Runtime {
         const runtime = this.props.data;
 
         return (
-            <div className='mdl-grid'>
-                <div className='mdl-cell mdl-cell--6-col'>
-                    <Card title='Runtime Environment' content={this.buildVersions()} /><br/>
-                </div>
-                <div className='mdl-cell mdl-cell--6-col'>
-                    <Card title='Process' content={this.buildProcess()} />
-                </div>
-                <div className='mdl-cell mdl-cell--8-col'>
-                    <Card title='Environment' content={this.buildEnvironment()}/>
-                </div>
-            </div>
+            <Flex
+                flexWrap='wrap'>
+                <Card title='Runtime Environment' content={this.buildVersions()} />
+                <Card title='Process' content={this.buildProcess()} />
+                <Card title='Environment' content={this.buildEnvironment()}/>
+            </Flex>
         );
     };
 };

@@ -1,6 +1,11 @@
-import React, { PropTypes } from 'react';
+'use strict';
 
-export default class Card {
+import React, { PropTypes, Component } from 'react';
+import shouldPureComponentUpdate from 'react-pure-render/function';
+import { Flex } from 'jsxstyle';
+import { tabHeight, primaryColor, secondaryColor } from '../LayoutConstants';
+
+export default class Card extends Component {
 
     static propTypes = {
         title: PropTypes.string.isRequired,
@@ -8,18 +13,25 @@ export default class Card {
         actions: PropTypes.node
     };
 
+    shouldComponentUpdate = shouldPureComponentUpdate;
+
     render() {
 
         return (
-            <div className="mdl-card mdl-shadow--2dp" style={{width: '100%', marginBottom: 10}}>
-                <div className="mdl-card__title mdl-card--border" style={{backgroundColor: '#607D8B', color: 'white'}}>
-                    <h2 className="mdl-card__title-text">{this.props.title}</h2>
-                </div>
-                <div className="mdl-card__supporting-text mdl-card--border">{this.props.content}</div>
-                {/*<div className="mdl-card__actions mdl-card--border">
-                    <a href="#">Copy Data</a>
-                </div>*/}
-            </div>
+            <Flex
+                flexDirection='column'
+                width={400}
+                margin='5'>
+                <Flex
+                    alignItems='center'
+                    justifyContent='center'
+                    backgroundColor={primaryColor}
+                    height={tabHeight}
+                    color='white'>
+                    <span>{this.props.title}</span>
+                </Flex>
+                {this.props.content}
+            </Flex>
         );
     };
 };
